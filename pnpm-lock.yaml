@@ -14,9 +14,6 @@ importers:
       '@trpc/server':
         specifier: 11.0.0-rc.433
         version: 11.0.0-rc.433
-      '@vitest/coverage-v8':
-        specifier: ^1.6.0
-        version: 1.6.0(vitest@1.6.0)
       webextension-polyfill:
         specifier: ^0.10.0
         version: 0.10.0
@@ -24,6 +21,9 @@ importers:
       '@types/webextension-polyfill':
         specifier: ^0.10.7
         version: 0.10.7
+      '@vitest/coverage-v8':
+        specifier: ^1.6.0
+        version: 1.6.0(vitest@1.6.0)
       tsup:
         specifier: ^8.1.0
         version: 8.1.0(postcss@8.4.39)(typescript@5.5.2)

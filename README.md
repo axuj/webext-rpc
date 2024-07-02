@@ -1,8 +1,10 @@
 # webext-rpc
 
-This is a library for making RPC calls to a web extension from a web page. It uses the `webextension-polyfill` API to communicate with the extension.
+A type-safe RPC for all webextension, client side code does not contain the actual called code, supports async generator functions
 
-Supports normal functions, async functions, generator functions, and async generator functions.
+This is a library for making RPC calls to a web extension from a web page. It uses the `webextension-polyfill` API to communicate with the extension, supports all browsers (Chrome, Firefox, Safari).
+
+Supports `normal functions`, `async functions`, `generator functions`, and `async generator functions`.
 
 ## Usage
 

@@ -8,12 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@trpc/client':
-        specifier: 11.0.0-rc.433
-        version: 11.0.0-rc.433(@trpc/server@11.0.0-rc.433)
-      '@trpc/server':
-        specifier: 11.0.0-rc.433
-        version: 11.0.0-rc.433
       webextension-polyfill:
         specifier: ^0.10.0
         version: 0.10.0
@@ -27,9 +21,6 @@ importers:
       tsup:
         specifier: ^8.1.0
         version: 8.1.0(postcss@8.4.39)(typescript@5.5.2)
-      tsx:
-        specifier: ^4.16.0
-        version: 4.16.0
       typescript:
         specifier: ^5.5.2
         version: 5.5.2
@@ -339,14 +330,6 @@ packages:
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
 
-  '@trpc/client@11.0.0-rc.433':
-    resolution: {integrity: sha512-QEPk14HGP4GK/88v7ORChN2GYbaP+LlCJMQHPRFogaVzapSbiE6C6PN+vNTn8soD28SuPOu+lRzuJszLIuhIPA==}
-    peerDependencies:
-      '@trpc/server': 11.0.0-rc.433+014d1c839
-
-  '@trpc/server@11.0.0-rc.433':
-    resolution: {integrity: sha512-Zfafmbcv9HS/MBhW4O1JSw0b5Dnvm5PkwPviy64hyG9vRoCDPOLYyxRQD7TBdcWecITvjcQjmcdIGjQyNBVNJw==}
-
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
 
@@ -554,9 +537,6 @@ packages:
   get-stream@8.0.1:
     resolution: {integrity: sha512-VaUJspBffn/LMCJVoMvSAdmscJyS1auj5Zulnn5UoYcY531UWmdwhRWkcGKnGU93m5HSXP9LP2usOryrBtQowA==}
     engines: {node: '>=16'}
-
-  get-tsconfig@4.7.5:
-    resolution: {integrity: sha512-ZCuZCnlqNzjb4QprAzXKdpp/gh6KTxSJuw3IBsPnV/7fV4NxC9ckB+vPTt8w7fJA0TaSD7c55BR47JD6MEDyDw==}
 
   glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
@@ -850,9 +830,6 @@ packages:
     resolution: {integrity: sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw==}
     engines: {node: '>=8'}
 
-  resolve-pkg-maps@1.0.0:
-    resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
-
   reusify@1.0.4:
     resolution: {integrity: sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
@@ -1000,11 +977,6 @@ packages:
         optional: true
       typescript:
         optional: true
-
-  tsx@4.16.0:
-    resolution: {integrity: sha512-MPgN+CuY+4iKxGoJNPv+1pyo5YWZAQ5XfsyobUG+zoKG7IkvCPLZDEyoIb8yLS2FcWci1nlxAqmvPlFWD5AFiQ==}
-    engines: {node: '>=18.0.0'}
-    hasBin: true
 
   type-detect@4.0.8:
     resolution: {integrity: sha512-0fr/mIH1dlO+x7TlcMy+bIDqKPsw/70tVyeHW787goQjhmqaZe10uwLujubK9q9Lg6Fiho1KUKDYz0Z7k7g5/g==}
@@ -1304,12 +1276,6 @@ snapshots:
 
   '@sinclair/typebox@0.27.8': {}
 
-  '@trpc/client@11.0.0-rc.433(@trpc/server@11.0.0-rc.433)':
-    dependencies:
-      '@trpc/server': 11.0.0-rc.433
-
-  '@trpc/server@11.0.0-rc.433': {}
-
   '@types/estree@1.0.5': {}
 
   '@types/webextension-polyfill@0.10.7': {}
@@ -1564,10 +1530,6 @@ snapshots:
   get-stream@6.0.1: {}
 
   get-stream@8.0.1: {}
-
-  get-tsconfig@4.7.5:
-    dependencies:
-      resolve-pkg-maps: 1.0.0
 
   glob-parent@5.1.2:
     dependencies:
@@ -1831,8 +1793,6 @@ snapshots:
 
   resolve-from@5.0.0: {}
 
-  resolve-pkg-maps@1.0.0: {}
-
   reusify@1.0.4: {}
 
   rollup@4.18.0:
@@ -1985,13 +1945,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
       - ts-node
-
-  tsx@4.16.0:
-    dependencies:
-      esbuild: 0.21.5
-      get-tsconfig: 4.7.5
-    optionalDependencies:
-      fsevents: 2.3.3
 
   type-detect@4.0.8: {}
 

@@ -1,7 +1,7 @@
 {
   "name": "webext-rpc",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "A type-safe RPC for all webextension, client side code does not contain the actual called code, supports async generator functions",
   "type": "module",
   "publishConfig": {
     "access": "public"
@@ -23,18 +23,33 @@
     "test": "vitest",
     "buildWhithDemo": "pnpm run build && cd demo && pnpm install && pnpm run dev"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/axuj/webext-rpc"
+  },
+  "keywords": [
+    "webextension",
+    "extension",
+    "browser-extension",
+    "chrome-extension",
+    "firefox-extension",
+    "safari-extension",
+    "rpc",
+    "type-safe",
+    "webext",
+    "web-ext",
+    "chrome",
+    "firefox",
+    "safari",
+    "browser"
+  ],
+  "license": "MIT",
   "dependencies": {
-    "@trpc/client": "11.0.0-rc.433",
-    "@trpc/server": "11.0.0-rc.433",
     "webextension-polyfill": "^0.10.0"
   },
   "devDependencies": {
     "@types/webextension-polyfill": "^0.10.7",
     "tsup": "^8.1.0",
-    "tsx": "^4.16.0",
     "typescript": "^5.5.2",
     "vitest": "^1.6.0",
     "@vitest/coverage-v8": "^1.6.0"

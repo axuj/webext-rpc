@@ -12,8 +12,8 @@ importers:
         specifier: ^3.4.31
         version: 3.4.31(typescript@5.5.2)
       webext-rpc:
-        specifier: file:..
-        version: file:..(webextension-polyfill@0.10.0)
+        specifier: ^1.0.0
+        version: 1.0.0(webextension-polyfill@0.10.0)
     devDependencies:
       '@wxt-dev/module-vue':
         specifier: ^1.0.0
@@ -2129,8 +2129,8 @@ packages:
     resolution: {integrity: sha512-lAm05ELMr2WDPniyaHmyuPK0rb9tsftC8f/Ui5AQvlU6F3LqoBDfyzOaaUVQrLxtm4F5oax8AHPWswf/XjZzAg==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
 
-  webext-rpc@file:..:
-    resolution: {directory: .., type: directory}
+  webext-rpc@1.0.0:
+    resolution: {integrity: sha512-u+dfZ7csUi25w6eTRve18XxpyzglnybcRj0MTEWggIEUcWBJa+83do6LeMjziOV5Je9umZhORlqotfbZ7EZVYA==, tarball: https://registry.npmjs.org/webext-rpc/-/webext-rpc-1.0.0.tgz}
     peerDependencies:
       webextension-polyfill: ^0.10.0
 
@@ -4289,7 +4289,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  webext-rpc@file:..(webextension-polyfill@0.10.0):
+  webext-rpc@1.0.0(webextension-polyfill@0.10.0):
     dependencies:
       '@trpc/client': 11.0.0-rc.433(@trpc/server@11.0.0-rc.433)
       '@trpc/server': 11.0.0-rc.433

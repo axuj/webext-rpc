@@ -1,0 +1,45 @@
+{
+  "name": "webext-rpc",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index.cjs",
+  "module": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "require": "./lib/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --clean --out-dir lib --dts --format esm,cjs,iife --global-name extensionRpc",
+    "test": "vitest",
+    "buildWhithDemo": "pnpm run build && cd demo && pnpm install && pnpm run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@trpc/client": "11.0.0-rc.433",
+    "@trpc/server": "11.0.0-rc.433",
+    "webextension-polyfill": "^0.10.0"
+  },
+  "devDependencies": {
+    "@types/webextension-polyfill": "^0.10.7",
+    "tsup": "^8.1.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.2",
+    "vitest": "^1.6.0",
+    "@vitest/coverage-v8": "^1.6.0"
+  },
+  "peerDependencies": {
+    "webextension-polyfill": "^0.10.0"
+  }
+}

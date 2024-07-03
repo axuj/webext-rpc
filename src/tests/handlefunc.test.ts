@@ -76,4 +76,31 @@ describe('handleResult', () => {
       error: null,
     })
   })
+
+  it('void function', async () => {
+    const mockSendMessage = vi.fn()
+    const mockFunc = () => undefined
+
+    await handleCall(mockFunc, [], mockSendMessage)
+
+    expect(mockSendMessage).toHaveBeenCalledWith({
+      isStream: false,
+      value: undefined,
+      done: false,
+      error: null,
+    })
+  })
+
+  it('null function', async () => {
+    const mockSendMessage = vi.fn()
+    const mockFunc = () => null
+    await handleCall(mockFunc, [], mockSendMessage)
+
+    expect(mockSendMessage).toHaveBeenCalledWith({
+      isStream: false,
+      value: null,
+      done: false,
+      error: null,
+    })
+  })
 })

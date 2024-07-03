@@ -8,12 +8,15 @@ import type {
 } from './types'
 import { MessageStream } from './utils'
 import { createRpcCaller } from './utils/createRpcCaller'
+import { DEFAULT_PORT_NAME } from './port_name'
 
-export const createWebextRpcCaller = <
-  T extends RouterRecord
->(): PromisifiedRouter<T> => {
+export const createWebextRpcCaller = <T extends RouterRecord>(
+  port_name: string = DEFAULT_PORT_NAME
+): PromisifiedRouter<T> => {
   return createRpcCaller((calls, args) => {
-    const port = Browser.runtime.connect()
+    const port = Browser.runtime.connect({
+      name: port_name,
+    })
 
     const exposedPromise = new ExposedPromise()
     let messageStream: MessageStream<any> | null = null

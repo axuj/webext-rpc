@@ -12,7 +12,7 @@ export async function handleCall(
     return // 返回后不再处理其他逻辑
   }
 
-  if (typeof gen.next === 'function') {
+  if (typeof gen?.next === 'function') {
     if (typeof gen[Symbol.asyncIterator] === 'function') {
       let iterationResult = await gen.next()
       while (!iterationResult.done) {

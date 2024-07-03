@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { erpc } from '@/webext-rpc/erpc'
+  import { client } from '@/webext-rpc/client'
   function useTest(name: string, call: (value: Ref<any>) => void) {
     const value = ref()
     return {
@@ -14,16 +14,16 @@
 
   const tests = [
     useTest('normalFunction', async (value) => {
-      value.value = await erpc.a.b.normalFunction(3, 'this is c')
+      value.value = await client.normalFunction(3, 'this is c')
     }),
     useTest('asyncFunction', async (value) => {
-      value.value = await erpc.af.asyncFunction()
+      value.value = await client.asyncFunction()
     }),
     useTest('generatorFunction', async (value) => {
-      value.value = await erpc.generatorFunction()
+      value.value = await client.generateGroup.generatorFunction()
     }),
     useTest('asyncGeneratorFunction', async (value) => {
-      const iter = await erpc.asyncGeneratorFunction(4)
+      const iter = await client.generateGroup.asyncGeneratorFunction(4)
       if (value.value === undefined) {
         value.value = []
       }
@@ -37,6 +37,43 @@
         result.value.data.push(item)
       }
       result.value.status = 'done'
+    }),
+    useTest('fetchStream', async (value) => {
+      const gemini_key = 'your_gemini_key_here'
+      const iter = await client.fetchStream(
+        gemini_key,
+        'Write a 500-word fairy tale'
+      )
+      value.value = ''
+
+      function extractBracesContent(input: string): string {
+        const start = input.indexOf('{')
+        const end = input.lastIndexOf('}')
+
+        if (start === -1 || end === -1 || start >= end) {
+          return '' // 没有找到有效的 {} 包含内容
+        }
+        return input.substring(start, end + 1)
+      }
+
+      for await (const item of iter) {
+        const cleaned_text = extractBracesContent(item)
+        try {
+          if (!cleaned_text) {
+            continue
+          }
+          const parser = JSON.parse(cleaned_text)
+          const text = parser?.candidates?.[0]?.content?.parts?.[0]?.text
+          if (!text) {
+            continue
+          }
+          value.value += text
+        } catch (e) {
+          console.error('error parsing gemini response', e)
+          console.error('raw response:', item)
+          continue
+        }
+      }
     }),
   ]
 

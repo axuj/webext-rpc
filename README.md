@@ -8,7 +8,7 @@ Supports `normal functions`, `async functions`, `generator functions`, and `asyn
 
 ## Usage
 
-To use this library, you need to have a web extension installed in your browser. You can use the `webext-rpc` library by adding the following script tag to your web page
+To use this library, you need to install webext-rpc in your project. You can install it using npm with the following command:
 
 ```typescript
 pnpm install webext-rpc
@@ -18,13 +18,9 @@ pnpm install webext-rpc
 
 ```typescript
 // webext-rpc/router/index.ts
-export const router = {
-  normalFunction(id: number, msg: string) {
-    return `this is normalFunction, id:${id}, msg:${msg}`
-  },
-  async asyncFunction() {
-    return 'this is asyncFunction'
-  },
+import { readerToAsyncGenerator } from 'webext-rpc/utils'
+
+const generateGroup = {
   *generatorFunction() {
     yield 'this is generatorFunction 1'
     yield 'this is generatorFunction 2'
@@ -34,6 +30,23 @@ export const router = {
       await new Promise((resolve) => setTimeout(() => resolve(void 0), 1000))
       yield `this is asyncGeneratorFunction, count:${i} ,time:${Date.now()}`
     }
+  },
+}
+export const router = {
+  normalFunction(id: number, msg: string) {
+    return `this is normalFunction, id:${id}, msg:${msg}`
+  },
+  async asyncFunction() {
+    return 'this is asyncFunction'
+  },
+  generateGroup,
+  async *fetchStream(api_key: string, prompt: string) {
+    const response = await fetch(`...`)
+    const reader = response.body?.getReader()
+    yield* readerToAsyncGenerator(reader, (value) => {
+      const text = new TextDecoder().decode(value)
+      return text
+    })
   },
 }
 
@@ -54,25 +67,27 @@ createBackgroundHandler(router)
 3. Create a client and use it in the UI
 
 ```typescript
-// webext-rpc/erpc/index.ts
+// webext-rpc/client.ts
 import { createWebextRpcCaller } from 'webext-rpc'
 import type { AppRouter } from './router'
 
 // only use type
-export const erpc = createWebextRpcCaller<AppRouter>()
+export const client = createWebextRpcCaller<AppRouter>()
 ```
 
 ```typescript
 // entrypoints/content/app.ts
-import { erpc } from '@/webext-rpc/erpc'
-const a = await normalFunction(1, 'hello')
-const b = await asyncFunction()
-const c = await generatorFunction()
-const iter = await asyncGeneratorFunction(3)
+import { client } from '@/webext-rpc/erpc'
+const a = await client.normalFunction(1, 'hello')
+const b = await client.asyncFunction()
+const c = await client.generatorFunction()
+const iter = await client.asyncGeneratorFunction(3)
 const d = []
 for await (const i of iter) {
   d.push(i)
 }
+let e = ''
+e += await client.fetchStream('api_key', 'prompt')
 ```
 
 ## Inspiration

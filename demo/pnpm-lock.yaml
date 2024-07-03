@@ -12,8 +12,8 @@ importers:
         specifier: ^3.4.31
         version: 3.4.31(typescript@5.5.2)
       webext-rpc:
-        specifier: ^1.0.0
-        version: 1.0.0(webextension-polyfill@0.10.0)
+        specifier: file:..
+        version: file:..(webextension-polyfill@0.10.0)
     devDependencies:
       '@wxt-dev/module-vue':
         specifier: ^1.0.0
@@ -490,14 +490,6 @@ packages:
   '@szmarczak/http-timer@5.0.1':
     resolution: {integrity: sha512-+PmQX0PiAYPMeVYe237LJAYvOMYW1j2rH5YROyS3b4CTVJum34HfRvKvAzozHAQG0TnHNdUfY9nCeUyRAs//cw==}
     engines: {node: '>=14.16'}
-
-  '@trpc/client@11.0.0-rc.433':
-    resolution: {integrity: sha512-QEPk14HGP4GK/88v7ORChN2GYbaP+LlCJMQHPRFogaVzapSbiE6C6PN+vNTn8soD28SuPOu+lRzuJszLIuhIPA==}
-    peerDependencies:
-      '@trpc/server': 11.0.0-rc.433+014d1c839
-
-  '@trpc/server@11.0.0-rc.433':
-    resolution: {integrity: sha512-Zfafmbcv9HS/MBhW4O1JSw0b5Dnvm5PkwPviy64hyG9vRoCDPOLYyxRQD7TBdcWecITvjcQjmcdIGjQyNBVNJw==}
 
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
@@ -2129,10 +2121,10 @@ packages:
     resolution: {integrity: sha512-lAm05ELMr2WDPniyaHmyuPK0rb9tsftC8f/Ui5AQvlU6F3LqoBDfyzOaaUVQrLxtm4F5oax8AHPWswf/XjZzAg==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
 
-  webext-rpc@1.0.0:
-    resolution: {integrity: sha512-u+dfZ7csUi25w6eTRve18XxpyzglnybcRj0MTEWggIEUcWBJa+83do6LeMjziOV5Je9umZhORlqotfbZ7EZVYA==, tarball: https://registry.npmjs.org/webext-rpc/-/webext-rpc-1.0.0.tgz}
+  webext-rpc@file:..:
+    resolution: {directory: .., type: directory}
     peerDependencies:
-      webextension-polyfill: ^0.10.0
+      webextension-polyfill: ^0.12.0
 
   webextension-polyfill@0.10.0:
     resolution: {integrity: sha512-c5s35LgVa5tFaHhrZDnr3FpQpjj1BB+RXhLTYUxGqBVN460HkbM8TBtEqdXWbpTKfzwCcjAZVF7zXCYSKtcp9g==}
@@ -2523,12 +2515,6 @@ snapshots:
   '@szmarczak/http-timer@5.0.1':
     dependencies:
       defer-to-connect: 2.0.1
-
-  '@trpc/client@11.0.0-rc.433(@trpc/server@11.0.0-rc.433)':
-    dependencies:
-      '@trpc/server': 11.0.0-rc.433
-
-  '@trpc/server@11.0.0-rc.433': {}
 
   '@types/estree@1.0.5': {}
 
@@ -4289,10 +4275,8 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  webext-rpc@1.0.0(webextension-polyfill@0.10.0):
+  webext-rpc@file:..(webextension-polyfill@0.10.0):
     dependencies:
-      '@trpc/client': 11.0.0-rc.433(@trpc/server@11.0.0-rc.433)
-      '@trpc/server': 11.0.0-rc.433
       webextension-polyfill: 0.10.0
 
   webextension-polyfill@0.10.0: {}

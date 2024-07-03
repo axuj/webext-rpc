@@ -1,3 +1,5 @@
+import { readerToAsyncGenerator } from './readerToAsyncGenerator'
+
 export class MessageStream<T> {
   private readableStream: ReadableStream<T>
   private controller?: ReadableStreamDefaultController<T>
@@ -27,16 +29,6 @@ export class MessageStream<T> {
   // 返回一个异步生成器来获取数据
   async *getMessages(): AsyncGenerator<T, void, undefined> {
     const reader = this.readableStream.getReader()
-    try {
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) {
-          break
-        }
-        yield value
-      }
-    } finally {
-      reader.releaseLock()
-    }
+    yield* readerToAsyncGenerator(reader)
   }
 }

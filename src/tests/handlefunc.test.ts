@@ -11,8 +11,6 @@ describe('handleResult', () => {
     expect(mockSendMessage).toHaveBeenCalledWith({
       isStream: false,
       value: 'test',
-      done: false,
-      error: null,
     })
   })
 
@@ -30,19 +28,16 @@ describe('handleResult', () => {
       isStream: true,
       value: 'step1',
       done: false,
-      error: null,
     })
     expect(mockSendMessage).toHaveBeenNthCalledWith(2, {
       isStream: true,
       value: 'step2',
       done: false,
-      error: null,
     })
     expect(mockSendMessage).toHaveBeenNthCalledWith(3, {
       isStream: true,
       value: null,
       done: true,
-      error: null,
     })
   })
 
@@ -58,8 +53,6 @@ describe('handleResult', () => {
     expect(mockSendMessage).toHaveBeenCalledWith({
       isStream: false,
       value: ['step1', 'step2'],
-      done: false,
-      error: null,
     })
   })
 
@@ -72,8 +65,6 @@ describe('handleResult', () => {
     expect(mockSendMessage).toHaveBeenCalledWith({
       isStream: false,
       value: 'test',
-      done: false,
-      error: null,
     })
   })
 
@@ -86,8 +77,6 @@ describe('handleResult', () => {
     expect(mockSendMessage).toHaveBeenCalledWith({
       isStream: false,
       value: undefined,
-      done: false,
-      error: null,
     })
   })
 
@@ -99,8 +88,6 @@ describe('handleResult', () => {
     expect(mockSendMessage).toHaveBeenCalledWith({
       isStream: false,
       value: null,
-      done: false,
-      error: null,
     })
   })
 })

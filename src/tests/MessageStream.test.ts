@@ -72,4 +72,28 @@ describe('MessageStream', () => {
 
     expect(messages).toEqual(['message 1', 'message 2', 'message 3'])
   })
+
+  //继续编写测试
+  it('callback to AsyncGenerator', async () => {
+    async function testForCallback(
+      callback: (message: string) => Promise<void>
+    ) {
+      for (let i = 0; i < 3; i++) {
+        callback(`message ${i}`)
+      }
+    }
+
+    const stream = new MessageStream<string>()
+    testForCallback(async (message) => {
+      stream.addMessage(message)
+    })
+    stream.close()
+
+    const messageGenerator: AsyncGenerator<string> = stream.getMessages()
+
+    expect((await messageGenerator.next()).value).toBe('message 0')
+    expect((await messageGenerator.next()).value).toBe('message 1')
+    expect((await messageGenerator.next()).value).toBe('message 2')
+    expect((await messageGenerator.next()).done).toBe(true)
+  })
 })

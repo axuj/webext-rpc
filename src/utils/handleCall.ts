@@ -6,12 +6,15 @@ export async function handleCall(
   sendMessage: (message: B2CMessage) => void
 ): Promise<any> {
   const gen = func(...args)
+
+  // Promise
   if (gen instanceof Promise) {
     const result = await gen
-    sendMessage({ isStream: false, value: result, done: false, error: null })
+    sendMessage({ isStream: false, value: result })
     return // 返回后不再处理其他逻辑
   }
 
+  //Generator
   if (typeof gen?.next === 'function') {
     if (typeof gen[Symbol.asyncIterator] === 'function') {
       let iterationResult = await gen.next()
@@ -20,11 +23,10 @@ export async function handleCall(
           isStream: true,
           value: iterationResult.value,
           done: false,
-          error: null,
         })
         iterationResult = await gen.next()
       }
-      sendMessage({ isStream: true, value: null, done: true, error: null })
+      sendMessage({ isStream: true, value: null, done: true })
       return
     }
 
@@ -35,11 +37,13 @@ export async function handleCall(
         value.push(iterationResult.value)
         iterationResult = gen.next()
       }
-      sendMessage({ isStream: false, value, done: false, error: null })
+      sendMessage({ isStream: false, value })
       return
     }
+    sendMessage({ error: 'Unsupported generator type' })
     throw new Error('Unsupported generator type')
   }
 
-  sendMessage({ isStream: false, value: gen, done: false, error: null })
+  //Other
+  sendMessage({ isStream: false, value: gen })
 }

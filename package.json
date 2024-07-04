@@ -1,6 +1,6 @@
 {
   "name": "webext-rpc",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A type-safe RPC for all webextension, client side code does not contain the actual called code, supports async generator functions",
   "type": "module",
   "publishConfig": {
@@ -23,7 +23,7 @@
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/utils/index.ts --clean --out-dir lib --dts --format esm,cjs,iife --global-name extensionRpc",
+    "build": "tsup src/index.ts src/utils/index.ts --clean --out-dir lib --dts --format esm,cjs,iife --global-name webextRPC",
     "test": "vitest",
     "buildWhithDemo": "pnpm run build && cd demo && pnpm install && pnpm run dev"
   },
@@ -59,6 +59,6 @@
     "@vitest/coverage-v8": "^1.6.0"
   },
   "peerDependencies": {
-    "webextension-polyfill": "^0.12.0"
+    "webextension-polyfill": "^0.10.0"
   }
 }

@@ -1,5 +1,5 @@
 import Browser from 'webextension-polyfill'
-import { B2CMessage, C2BMessage, RouterRecord } from './types'
+import { C2BMessage, RouterRecord } from './types'
 import { toError } from './utils/util'
 import { handleCall } from './utils/handleCall'
 import { DEFAULT_PORT_NAME } from './port_name'
@@ -14,15 +14,9 @@ export function createBackgroundHandler(
     }
     port.onMessage.addListener(async (message: C2BMessage) => {
       const { calls, args } = message
-      let result: B2CMessage = {
-        isStream: false,
-        value: null,
-        error: null,
-        done: false,
-      }
+
       function throwError(error: Error) {
-        result.error = error.message
-        port.postMessage(result)
+        port.postMessage({ error: error.message })
         throw error
       }
       try {

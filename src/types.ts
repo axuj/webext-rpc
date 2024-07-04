@@ -2,12 +2,25 @@ export interface RouterRecord {
   [key: string]: Function | RouterRecord
 }
 
-export interface B2CMessage {
-  isStream: boolean
+interface BaseMessage {
+  error?: undefined
   value: any
-  done: boolean
-  error: string | null
 }
+
+interface StreamMessage extends BaseMessage {
+  isStream: true
+  done: boolean
+}
+
+interface NonStreamMessage extends BaseMessage {
+  isStream: false
+}
+
+interface ErrorMessage {
+  error: string
+}
+
+export type B2CMessage = ErrorMessage | StreamMessage | NonStreamMessage
 
 export interface C2BMessage {
   calls: string[]
@@ -29,9 +42,3 @@ export type PromisifiedRouter<T> = {
     ? Promisify<T[K]>
     : PromisifiedRouter<T[K]>
 }
-
-// type Router = {
-//   f(): Generator<string, void, unknown>
-// }
-
-// type a = PromisifiedRouter<Router>

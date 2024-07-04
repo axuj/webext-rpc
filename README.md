@@ -77,7 +77,7 @@ export const client = createWebextRpcCaller<AppRouter>()
 
 ```typescript
 // entrypoints/content/app.ts
-import { client } from '@/webext-rpc/erpc'
+import { client } from '@/webext-rpc/client'
 const a = await client.normalFunction(1, 'hello')
 const b = await client.asyncFunction()
 const c = await client.generatorFunction()
@@ -87,7 +87,58 @@ for await (const i of iter) {
   d.push(i)
 }
 let e = ''
-e += await client.fetchStream('api_key', 'prompt')
+const fetch_iter = await client.fetchStream('api_key', 'prompt')
+for await (const i of fetch_iter) {
+  e += i
+}
+```
+
+Check out the [demo](https://github.com/axuj/webext-rpc/tree/main/demo)
+
+## Generate utils
+
+### readerToAsyncGenerator
+
+This function converts a `ReadableStreamDefaultReader` to an `AsyncGenerator`.
+
+```typescript
+import { readerToAsyncGenerator } from 'webext-rpc/utils'
+const response = await fetch(`...`)
+const reader = response.body?.getReader()
+yield *
+  readerToAsyncGenerator(reader, (value) => {
+    const text = new TextDecoder().decode(value)
+    return text
+  })
+```
+
+### MessageStream
+
+MessageStream allows for handling message streams.
+It provides a mechanism to add messages and signal the end of the stream.
+Consumers can then utilize an AsyncGenerator to process the stream
+
+```typescript
+import { ExposedPromise } from 'webext-rpc/utils'
+
+async function testForCallback(callback: (message: string) => Promise<void>) {
+  for (let i = 0; i < 3; i++) {
+    callback(`message ${i}`)
+  }
+}
+
+const stream = new MessageStream<string>()
+testForCallback(async (message) => {
+  stream.addMessage(message)
+})
+stream.close()
+
+const messageGenerator: AsyncGenerator<string> = stream.getMessages()
+
+expect((await messageGenerator.next()).value).toBe('message 0')
+expect((await messageGenerator.next()).value).toBe('message 1')
+expect((await messageGenerator.next()).value).toBe('message 2')
+expect((await messageGenerator.next()).done).toBe(true)
 ```
 
 ## Inspiration

@@ -2124,7 +2124,7 @@ packages:
   webext-rpc@file:..:
     resolution: {directory: .., type: directory}
     peerDependencies:
-      webextension-polyfill: ^0.12.0
+      webextension-polyfill: ^0.10.0
 
   webextension-polyfill@0.10.0:
     resolution: {integrity: sha512-c5s35LgVa5tFaHhrZDnr3FpQpjj1BB+RXhLTYUxGqBVN460HkbM8TBtEqdXWbpTKfzwCcjAZVF7zXCYSKtcp9g==}

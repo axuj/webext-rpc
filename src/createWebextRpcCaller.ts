@@ -20,29 +20,28 @@ export const createWebextRpcCaller = <T extends RouterRecord>(
 
     const exposedPromise = new ExposedPromise()
     let messageStream: MessageStream<any> | null = null
-    function throwError(error_message: string) {
-      throw new Error(error_message)
-    }
     port.onMessage.addListener((message: B2CMessage) => {
-      if (messageStream) {
-        if (message.error) {
-          throwError(message.error)
-        }
-        if (!message.done) {
-          messageStream.addMessage(message.value)
-        }
-        //done的逻辑在onDisconnect中处理
-        return
+      if (message.error != undefined) {
+        throw new Error(message.error)
       }
 
-      if (message.error) {
-        throwError(message.error)
-      }
-
+      // stream
       if (message.isStream) {
-        messageStream = new MessageStream()
+        if (message.done) {
+          return
+        }
+
+        // if messageStream is null, it means we are receiving the first message
+        if (messageStream === null) {
+          messageStream = new MessageStream()
+          messageStream.addMessage(message.value)
+          exposedPromise.resolve(messageStream.getMessages())
+          return
+        }
+
+        // if messageStream is not null, it means we are already streaming
         messageStream.addMessage(message.value)
-        exposedPromise.resolve(messageStream.getMessages())
+        return
       }
 
       exposedPromise.resolve(message.value)
@@ -54,7 +53,7 @@ export const createWebextRpcCaller = <T extends RouterRecord>(
       }
     })
 
-    port.postMessage({ calls, args } as C2BMessage)
+    port.postMessage({ calls, args })
     return exposedPromise.promise
   })
 }

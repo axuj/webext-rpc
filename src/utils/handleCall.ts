@@ -40,8 +40,13 @@ export async function handleCall(
       sendMessage({ isStream: false, value })
       return
     }
-    sendMessage({ error: 'Unsupported generator type' })
-    throw new Error('Unsupported generator type')
+    const error = {
+      message: 'Unsupported type of generator',
+      stack: new Error().stack,
+      name: 'UnsupportedType',
+    }
+    sendMessage({ error })
+    throw error
   }
 
   //Other

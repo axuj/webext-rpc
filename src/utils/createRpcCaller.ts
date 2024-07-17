@@ -1,8 +1,8 @@
-import { PromisifiedRouter, RouterRecord } from '../types'
+import { RpcRouter, RouterRecord } from '../types'
 
 export function createRpcCaller<T extends RouterRecord>(
   callbacks: (calls: string[], args: any[]) => Promise<any>
-): PromisifiedRouter<T> {
+): RpcRouter<T> {
   const createProxyObject = (calls: string[] = []): any => {
     const handler: ProxyHandler<any> = {
       get(_thisArg, prop, receiver) {
@@ -15,5 +15,5 @@ export function createRpcCaller<T extends RouterRecord>(
     return new Proxy(() => {}, handler)
   }
 
-  return createProxyObject() as PromisifiedRouter<T>
+  return createProxyObject() as RpcRouter<T>
 }

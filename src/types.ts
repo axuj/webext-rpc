@@ -16,8 +16,14 @@ interface NonStreamMessage extends BaseMessage {
   isStream: false
 }
 
-interface ErrorMessage {
-  error: string
+export interface ErrorSerializable {
+  message: string
+  stack?: string
+  name: string
+}
+
+export interface ErrorMessage {
+  error: ErrorSerializable
 }
 
 export type B2CMessage = ErrorMessage | StreamMessage | NonStreamMessage
@@ -27,7 +33,7 @@ export interface C2BMessage {
   args: any[]
 }
 
-export type Promisify<T> = T extends (...args: infer A) => infer R
+export type RpcFunction<T> = T extends (...args: infer A) => infer R
   ? (
       ...args: A
     ) => R extends Promise<any>
@@ -37,8 +43,8 @@ export type Promisify<T> = T extends (...args: infer A) => infer R
       : Promise<R>
   : Promise<T>
 
-export type PromisifiedRouter<T> = {
+export type RpcRouter<T> = {
   [K in keyof T]: T[K] extends (...args: any) => any
-    ? Promisify<T[K]>
-    : PromisifiedRouter<T[K]>
+    ? RpcFunction<T[K]>
+    : RpcRouter<T[K]>
 }

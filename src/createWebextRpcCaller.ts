@@ -1,18 +1,13 @@
 import Browser from 'webextension-polyfill'
 import { ExposedPromise } from './utils'
-import type {
-  B2CMessage,
-  C2BMessage,
-  PromisifiedRouter,
-  RouterRecord,
-} from './types'
+import type { B2CMessage, RpcRouter, RouterRecord } from './types'
 import { MessageStream } from './utils'
 import { createRpcCaller } from './utils/createRpcCaller'
 import { DEFAULT_PORT_NAME } from './port_name'
 
 export const createWebextRpcCaller = <T extends RouterRecord>(
   port_name: string = DEFAULT_PORT_NAME
-): PromisifiedRouter<T> => {
+): RpcRouter<T> => {
   return createRpcCaller((calls, args) => {
     const port = Browser.runtime.connect({
       name: port_name,
@@ -21,8 +16,13 @@ export const createWebextRpcCaller = <T extends RouterRecord>(
     const exposedPromise = new ExposedPromise()
     let messageStream: MessageStream<any> | null = null
     port.onMessage.addListener((message: B2CMessage) => {
-      if (message.error != undefined) {
-        throw new Error(message.error)
+      if (message.error) {
+        const error = new Error(message.error.message)
+        error.stack =
+          '[webext-rpc background function error]' + message.error.stack
+        error.name = message.error.name
+        exposedPromise.reject(error)
+        return
       }
 
       // stream

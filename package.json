@@ -25,7 +25,8 @@
   "scripts": {
     "build": "tsup src/index.ts src/utils/index.ts --clean --out-dir lib --dts --format esm,cjs,iife --global-name webextRPC",
     "test": "vitest",
-    "buildWhithDemo": "pnpm run build && cd demo && pnpm install && pnpm run dev"
+    "buildWhithDemo": "pnpm run build && cd demo && pnpm install && pnpm run dev",
+    "publish:ci": "tsx scripts/release.ts"
   },
   "repository": {
     "type": "git",
@@ -53,10 +54,12 @@
   },
   "devDependencies": {
     "@types/webextension-polyfill": "^0.10.7",
-    "tsup": "^8.1.0",
+    "@vitest/coverage-v8": "^2.0.3",
+    "tsup": "^8.1.1",
+    "tsx": "^4.16.2",
     "typescript": "^5.5.3",
-    "vitest": "^1.6.0",
-    "@vitest/coverage-v8": "^1.6.0"
+    "vitest": "^2.0.3",
+    "zx": "^8.1.4"
   },
   "peerDependencies": {
     "webextension-polyfill": "^0.10.0"

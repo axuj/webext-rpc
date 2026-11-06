@@ -15,6 +15,47 @@ export const createWebextRpcCaller = <T extends RouterRecord>(
 
     const exposedPromise = new ExposedPromise()
     let messageStream: MessageStream<any> | null = null
+    let settled = false
+    let disconnected = false
+
+    const callPath = calls.length > 0 ? calls.join('.') : '<root>'
+
+    const resolveCall = (value: any) => {
+      if (settled) return
+      settled = true
+      exposedPromise.resolve(value)
+    }
+
+    const rejectCall = (error: unknown) => {
+      if (settled) return
+      settled = true
+      exposedPromise.reject(error)
+    }
+
+    // Disconnecting twice is harmless: the background may already have done it.
+    const disconnectPort = () => {
+      if (disconnected) return
+      disconnected = true
+      try {
+        port.disconnect()
+      } catch {
+        // The port is already gone.
+      }
+    }
+
+    // The caller may stop iterating early; disconnect in that case too. The
+    // underlying generator is not consumed until the caller asks for a value.
+    const wrapStream = (stream: MessageStream<any>): AsyncGenerator<any> => {
+      const generator = stream.getMessages()
+      return (async function* () {
+        try {
+          yield* generator
+        } finally {
+          disconnectPort()
+        }
+      })()
+    }
+
     port.onMessage.addListener((rawMessage) => {
       // @types/webextension-polyfill >=0.11 types the listener message as `unknown`
       const message = rawMessage as B2CMessage
@@ -23,13 +64,31 @@ export const createWebextRpcCaller = <T extends RouterRecord>(
         error.stack =
           '[webext-rpc background function error]' + message.error.stack
         error.name = message.error.name
-        exposedPromise.reject(error)
+
+        if (messageStream) {
+          // The caller already has the stream: surface the error to the
+          // consumer instead of rejecting an already-resolved promise.
+          messageStream.error(error)
+          return
+        }
+
+        rejectCall(error)
         return
       }
 
       // stream
       if (message.isStream) {
         if (message.done) {
+          if (messageStream === null) {
+            // The function returned an empty async generator: the first
+            // message is already the terminal one.
+            const emptyStream = new MessageStream<any>()
+            emptyStream.close()
+            resolveCall(wrapStream(emptyStream))
+            return
+          }
+
+          messageStream.close()
           return
         }
 
@@ -37,7 +96,7 @@ export const createWebextRpcCaller = <T extends RouterRecord>(
         if (messageStream === null) {
           messageStream = new MessageStream()
           messageStream.addMessage(message.value)
-          exposedPromise.resolve(messageStream.getMessages())
+          resolveCall(wrapStream(messageStream))
           return
         }
 
@@ -46,16 +105,31 @@ export const createWebextRpcCaller = <T extends RouterRecord>(
         return
       }
 
-      exposedPromise.resolve(message.value)
+      resolveCall(message.value)
     })
 
     port.onDisconnect.addListener(() => {
       if (messageStream) {
         messageStream.close()
       }
+
+      if (!settled) {
+        rejectCall(
+          new Error(
+            `Port disconnected before a response for RPC call "${callPath}"`
+          )
+        )
+      }
     })
 
-    port.postMessage({ calls, args })
+    try {
+      port.postMessage({ calls, args })
+    } catch (error) {
+      // The port could not even be written to: do not leave the caller hanging.
+      rejectCall(error)
+      disconnectPort()
+    }
+
     return exposedPromise.promise
   })
 }

@@ -5,10 +5,17 @@ export async function handleCall(
   args: any[],
   sendMessage: (message: B2CMessage) => void
 ): Promise<any> {
+  if (typeof func !== 'function') {
+    throw new TypeError(
+      `RPC target is not callable: expected a function, received ${typeof func}`
+    )
+  }
+
   const gen = func(...args)
 
-  // Promise
-  if (gen instanceof Promise) {
+  // Promise / thenable. Checking for `.then` instead of `instanceof Promise`
+  // also handles cross-realm promises and any other thenable.
+  if (gen !== null && gen !== undefined && typeof gen.then === 'function') {
     const result = await gen
     sendMessage({ isStream: false, value: result })
     return // 返回后不再处理其他逻辑

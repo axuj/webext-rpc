@@ -1,4 +1,6 @@
 import { B2CMessage } from '../types'
+import { RpcError } from '../RpcError'
+import { toErrorMessage } from './util'
 
 export async function handleCall(
   func: Function,
@@ -47,12 +49,10 @@ export async function handleCall(
       sendMessage({ isStream: false, value })
       return
     }
-    const error = {
-      message: 'Unsupported type of generator',
-      stack: new Error().stack,
+    const error = new RpcError('REMOTE_ERROR', 'Unsupported type of generator', {
       name: 'UnsupportedType',
-    }
-    sendMessage({ error })
+    })
+    sendMessage({ error: toErrorMessage(error) })
     throw error
   }
 

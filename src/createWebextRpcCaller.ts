@@ -1,9 +1,30 @@
 import Browser from 'webextension-polyfill'
 import { ExposedPromise } from './utils'
-import type { B2CMessage, RpcRouter, RouterRecord } from './types'
+import type { B2CMessage, ErrorSerializable, RpcRouter, RouterRecord } from './types'
 import { MessageStream } from './utils'
 import { createRpcCaller } from './utils/createRpcCaller'
 import { DEFAULT_PORT_NAME } from './port_name'
+import { isRpcErrorCode, RpcError } from './RpcError'
+
+const BACKGROUND_STACK_PREFIX = '[webext-rpc background function error]'
+
+// Rebuild the error the background serialised. `code` is optional so a caller
+// upgraded ahead of the background still gets a usable error.
+function deserializeError(serialized: ErrorSerializable): RpcError {
+  const error = new RpcError(
+    isRpcErrorCode(serialized.code) ? serialized.code : 'REMOTE_ERROR',
+    serialized.message,
+    { name: serialized.name }
+  )
+
+  // Only prefix a stack that exists: concatenating the prefix with `undefined`
+  // produced the literal string "...]undefined".
+  if (serialized.stack) {
+    error.stack = `${BACKGROUND_STACK_PREFIX}${serialized.stack}`
+  }
+
+  return error
+}
 
 export const createWebextRpcCaller = <T extends RouterRecord>(
   port_name: string = DEFAULT_PORT_NAME
@@ -60,15 +81,13 @@ export const createWebextRpcCaller = <T extends RouterRecord>(
       // @types/webextension-polyfill >=0.11 types the listener message as `unknown`
       const message = rawMessage as B2CMessage
       if (message.error) {
-        const error = new Error(message.error.message)
-        error.stack =
-          '[webext-rpc background function error]' + message.error.stack
-        error.name = message.error.name
+        const error = deserializeError(message.error)
 
         if (messageStream) {
           // The caller already has the stream: surface the error to the
-          // consumer instead of rejecting an already-resolved promise.
-          messageStream.error(error)
+          // consumer instead of rejecting an already-resolved promise. Values
+          // that already arrived are still delivered before the throw.
+          messageStream.endWithError(error)
           return
         }
 
@@ -110,12 +129,22 @@ export const createWebextRpcCaller = <T extends RouterRecord>(
 
     port.onDisconnect.addListener(() => {
       if (messageStream) {
-        messageStream.close()
+        // A disappearing port used to look exactly like a clean end of stream.
+        // Deliver what was already queued, then throw, so a truncated stream
+        // cannot pass for a complete one. This is a no-op once the terminal
+        // `{ done: true }` message has closed the stream.
+        messageStream.endWithError(
+          new RpcError(
+            'PORT_DISCONNECTED',
+            `Port disconnected during the streaming RPC call "${callPath}"`
+          )
+        )
       }
 
       if (!settled) {
         rejectCall(
-          new Error(
+          new RpcError(
+            'PORT_DISCONNECTED',
             `Port disconnected before a response for RPC call "${callPath}"`
           )
         )

@@ -20,6 +20,9 @@ export interface ErrorSerializable {
   message: string
   stack?: string
   name: string
+  // Optional so a newer caller still understands an older background that
+  // never sent a code.
+  code?: string
 }
 
 export interface ErrorMessage {

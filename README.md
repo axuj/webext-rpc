@@ -40,9 +40,12 @@ export const router = {
     return 'this is asyncFunction'
   },
   generateGroup,
-  async *fetchStream(api_key: string, prompt: string) {
+  async *fetchStream(prompt: string) {
     const response = await fetch(`...`)
     const reader = response.body?.getReader()
+    if (!reader) {
+      throw new Error('No response body')
+    }
     yield* readerToAsyncGenerator(reader, (value) => {
       const text = new TextDecoder().decode(value)
       return text
@@ -87,13 +90,53 @@ for await (const i of iter) {
   d.push(i)
 }
 let e = ''
-const fetch_iter = await client.fetchStream('api_key', 'prompt')
+const fetch_iter = await client.fetchStream('prompt')
 for await (const i of fetch_iter) {
   e += i
 }
 ```
 
 Check out the [demo](https://github.com/axuj/webext-rpc/tree/main/demo)
+
+## Error handling
+
+A failed call rejects with an `RpcError` carrying a `code` you can branch on:
+
+```typescript
+import { RpcError } from 'webext-rpc'
+
+try {
+  await client.normalFunction(1, 'hello')
+} catch (error) {
+  if (error instanceof RpcError) {
+    switch (error.code) {
+      // The port went away before the call finished.
+      case 'PORT_DISCONNECTED':
+      // The background function threw.
+      case 'REMOTE_ERROR':
+      // The path does not resolve to a function in the router.
+      case 'INVALID_PATH':
+      // The message was malformed.
+      case 'INVALID_REQUEST':
+    }
+  }
+}
+```
+
+Streams behave the same way. A stream that is cut short (the port disappears, the background is killed, the extension reloads) throws after delivering the values already received, so a truncated stream never looks like a completed one:
+
+```typescript
+let text = ''
+try {
+  for await (const chunk of await client.fetchStream('prompt')) {
+    text += chunk
+  }
+} catch (error) {
+  // `text` still holds everything that arrived before the disconnect.
+}
+```
+
+`cause` is only available where the error was created; it does not cross the port.
 
 ## Generate utils
 

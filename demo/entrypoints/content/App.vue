@@ -39,40 +39,10 @@
       result.value.status = 'done'
     }),
     useTest('fetchStream', async (value) => {
-      const gemini_key = 'your_gemini_key_here'
-      const iter = await client.fetchStream(
-        gemini_key,
-        'Write a 500-word fairy tale'
-      )
       value.value = ''
-
-      function extractBracesContent(input: string): string {
-        const start = input.indexOf('{')
-        const end = input.lastIndexOf('}')
-
-        if (start === -1 || end === -1 || start >= end) {
-          return '' // 没有找到有效的 {} 包含内容
-        }
-        return input.substring(start, end + 1)
-      }
-
+      const iter = await client.fetchStream('Write a 500-word fairy tale')
       for await (const item of iter) {
-        const cleaned_text = extractBracesContent(item)
-        try {
-          if (!cleaned_text) {
-            continue
-          }
-          const parser = JSON.parse(cleaned_text)
-          const text = parser?.candidates?.[0]?.content?.parts?.[0]?.text
-          if (!text) {
-            continue
-          }
-          value.value += text
-        } catch (e) {
-          console.error('error parsing gemini response', e)
-          console.error('raw response:', item)
-          continue
-        }
+        value.value += item
       }
     }),
   ]
@@ -98,6 +68,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background-color: #f5f5f5;
+      color: #333;
       border-radius: 10px;
       z-index: 9999;
       padding: 20px;

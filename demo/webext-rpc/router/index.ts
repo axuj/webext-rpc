@@ -20,36 +20,23 @@ export const router = {
     return 'this is asyncFunction'
   },
   generateGroup,
-  async *fetchStream(api_key: string, prompt: string) {
-    const url =
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent'
-    const response = await fetch(`${url}?key=${api_key}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 1024,
-        },
-      }),
-    })
+  // Streams from a local chunked endpoint served by the WXT dev server, so the
+  // demo needs no API key or network access. The fetch / status check / reader
+  // path is the same one a real streaming API would use.
+  async *fetchStream(prompt: string) {
+    const url = new URL('http://localhost:3526/mock/stream')
+    url.searchParams.set('prompt', prompt)
+    url.searchParams.set('delay', '100')
 
+    const response = await fetch(url)
     if (!response.ok) {
-      throw new Error('Network response was not ok')
+      throw new Error(`Stream request failed with status ${response.status}`)
     }
     const reader = response.body?.getReader()
     if (!reader) {
       throw new Error('Failed to get reader from response body')
     }
-    yield* readerToAsyncGenerator(reader, (value) => {
-      const text = new TextDecoder().decode(value)
-      return text
-    })
+    yield* readerToAsyncGenerator(reader, (value) => new TextDecoder().decode(value))
   },
 }
 

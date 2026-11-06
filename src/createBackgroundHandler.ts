@@ -12,8 +12,9 @@ export function createBackgroundHandler(
     if (port.name !== port_name) {
       return
     }
-    port.onMessage.addListener(async (message: C2BMessage) => {
-      const { calls, args } = message
+    port.onMessage.addListener(async (rawMessage) => {
+      // @types/webextension-polyfill >=0.11 types the listener message as `unknown`
+      const { calls, args } = rawMessage as C2BMessage
 
       function throwError(error: unknown) {
         const error_message = toErrorMessage(error)

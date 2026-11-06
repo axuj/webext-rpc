@@ -8,7 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "inlineSources": false,
     "isolatedModules": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
@@ -17,5 +17,6 @@
     "module": "ESNext",
     "target": "ESNext"
   },
+  "include": ["src"],
   "exclude": ["node_modules", "lib"]
 }

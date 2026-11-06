@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      # pnpm 9.5.0 comes from `packageManager` in package.json.
+      - uses: pnpm/action-setup@v6
+
+      # `.node-version` pins the major; check-latest follows the newest patch.
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          check-latest: true
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm exec tsc --noEmit
+      - run: pnpm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+      - run: pnpm exec vitest run

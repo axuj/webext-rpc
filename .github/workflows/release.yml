@@ -1,42 +1,93 @@
-name: Publish Package
+name: Release
 
-permissions:
-  id-token: write
-  contents: write
+# Publishes webext-rpc when a `v*` tag is pushed. `workflow_dispatch` packs the
+# tarball without publishing; this workflow never creates tags or bumps versions.
+#
+# `.node-version` pins the Node major only; CI resolves the newest matching
+# patch (check-latest), so patch upgrades need no file change. `engines.node`
+# in package.json is the supported range for consumers.
+#
+# Auth is OIDC (npm trusted publishing): no NPM_TOKEN secret is used. On npmjs.com
+# the package's trusted publisher must list `axuj/webext-rpc` and this exact
+# workflow filename (`release.yml`). Provenance is attached automatically.
+# Configure it before pushing the next tag, or publishing fails with ENEEDAUTH.
+#
+# Trusted publishing needs npm >= 11.5.1 and Node >= 22.14.0; every Node 26
+# release ships npm 11, so there is no npm upgrade step here.
 
 on:
   push:
     tags:
-      - v*
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
-  publish-npm:
+  publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+
+      # pnpm 9.5.0 comes from `packageManager` in package.json.
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          check-latest: true
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm exec tsc --noEmit
+      - run: pnpm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+      - run: pnpm exec vitest run
+
+      - name: Check the tag matches the package version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "tag $GITHUB_REF_NAME does not match package version v$version"
+            exit 1
+          fi
+
+      - name: Pack (dry run)
+        if: github.event_name == 'workflow_dispatch'
+        run: npm pack --dry-run
+
+      - name: Publish
+        if: github.event_name == 'push'
+        run: npm publish --access public
+
+  release-notes:
+    needs: publish
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Use Node.js v18
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 18
-          registry-url: https://registry.npmjs.org/
-          cache: pnpm
+          node-version-file: .node-version
+          check-latest: true
 
-      - run: pnpm install
-
-      - run: npx changelogithub --no-group
+      - run: npx --yes changelogithub --no-group
         continue-on-error: true
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-      - run: pnpm run publish:ci
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-          NPM_CONFIG_PROVENANCE: true
-          NODE_OPTIONS: --max-old-space-size=6144
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

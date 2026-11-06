@@ -15,7 +15,9 @@ export const createWebextRpcCaller = <T extends RouterRecord>(
 
     const exposedPromise = new ExposedPromise()
     let messageStream: MessageStream<any> | null = null
-    port.onMessage.addListener((message: B2CMessage) => {
+    port.onMessage.addListener((rawMessage) => {
+      // @types/webextension-polyfill >=0.11 types the listener message as `unknown`
+      const message = rawMessage as B2CMessage
       if (message.error) {
         const error = new Error(message.error.message)
         error.stack =

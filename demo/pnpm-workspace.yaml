@@ -1,0 +1,10 @@
+# The demo is its own pnpm project; the settings below only allow esbuild to
+# run its install script so `pnpm install` does not fail on pnpm 10+.
+packages:
+  - .
+# pnpm <12
+onlyBuiltDependencies:
+  - esbuild
+# pnpm >=12
+allowBuilds:
+  esbuild: true

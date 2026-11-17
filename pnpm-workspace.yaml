@@ -1,0 +1,14 @@
+# Settings home for pnpm 10+; `packages` keeps this file readable by pnpm 9,
+# which refuses a workspace file without it.
+packages:
+  - .
+# pnpm 10+ skips dependency build scripts unless they are allowed here, and an
+# install with a skipped script exits non-zero. Both packages need theirs: swc
+# places its native binding, esbuild verifies its platform binary.
+allowBuilds:
+  "@swc/core": true
+  esbuild: true
+# Same allowlist for pnpm <12, which predates `allowBuilds`.
+onlyBuiltDependencies:
+  - "@swc/core"
+  - esbuild

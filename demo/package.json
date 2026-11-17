@@ -15,7 +15,7 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
-    "vue": "^3.4.31",
+    "vue": "^3.5.45",
     "webext-rpc": "file:.."
   },
   "devDependencies": {
